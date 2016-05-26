@@ -1,0 +1,14 @@
+[
+{
+  "modid": "mycommands",
+  "name": "MY Commands",
+  "description": "SMP Commands ",
+  "version": "@version",
+  "mcversion": "@mcversion",
+  "updateUrl": "",
+  "authors": ["Lordwissend, Jtraudel"],
+  "credits": "Thanks to MCP and Forge Teams.",
+  "logoFile": "",
+  "screenshots": []
+}
+]
