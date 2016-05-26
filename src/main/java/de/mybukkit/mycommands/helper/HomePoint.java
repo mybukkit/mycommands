@@ -7,9 +7,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class HomePoint
 {
-	public String name;
+	public String UUID;
 	public Location location;
-	//private String homename;
+	public String homename;
 
 	private static SaveFile homesSaveFile = new SaveFile("homes.txt",mycommands.configPath+"/homes/");
 
@@ -17,19 +17,21 @@ public class HomePoint
 
 	public HomePoint(EntityPlayerMP player, String name)
 	{
-		this.name = player.getUniqueID()+","+name;
+		this.UUID = player.getUniqueID().toString();
+		this.homename =	name;
 		location = new Location(player);
 	}
 
-	public HomePoint(String name, Location location)
+	public HomePoint(EntityPlayerMP player,String name, Location location)
 	{
-		this.name = name;
+		this.UUID=player.getUniqueID().toString();
+		this.homename = name;
 		this.location = location;
 	}
 
 	public static HomePoint getHome(EntityPlayerMP player,String name)
 	{
-		HomePoint target = new HomePoint(player.getUniqueID().toString()+","+name,null);
+		HomePoint target = new HomePoint(player,name,null);
 		if(homes.contains(target))
 			return homes.get(homes.indexOf(target));
 
@@ -44,14 +46,14 @@ public class HomePoint
 	{
 		Location location = new Location(player);
 		
-		HomePoint home = new HomePoint(player.getUniqueID().toString()+","+name, location);
+		HomePoint home = new HomePoint(player,name, location);
 
 		if(homes.contains(home))
 			homes.remove(home);
 
 		homes.add(home);
 
-		if(location.dimension == 0)
+		if(name.equalsIgnoreCase("home")&&location.dimension == 0)
 			location.setSpawn(player);
 
 		saveAll();
@@ -62,17 +64,6 @@ public class HomePoint
 	/**
 	 * @return true on success, false when there's no WarpPoint with this name.
 	 */
-/*	public static boolean delWarpPoint(String name)
-	{
-		HomePoint warpPoint = new HomePoint(name, null);
-		if(warpPoints.contains(warpPoint))
-		{
-			warpPoints.remove(warpPoint);
-			saveAll();
-			return true;
-		}
-		return false;
-	}*/
 
 	public static void loadAll()
 	{
@@ -102,14 +93,17 @@ public class HomePoint
 	{
 		try
 		{
-			this.name = info.substring(0,info.indexOf("("));
+			this.UUID = info.substring(0,info.indexOf(","));
+			this.homename = info.substring(info.indexOf(",")+1,info.indexOf("("));
+
 			String locationInfo = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
 			this.location = new Location(locationInfo);
 		}
 		catch(Exception e)
 		{
 			System.err.println("Exception on attemping to rebuild WarpPoint from String.");
-			name = "Error";
+			UUID="Error";
+			homename = "Error";
 			location = new Location(0,0,0,0);
 		}
 	}
@@ -122,14 +116,14 @@ public class HomePoint
 		if(location == null)
 			return "";
 
-		return name +"(" + location.toString() + ")";
+		return UUID+","+homename +"(" + location.toString() + ")";
 	}
 
 	@Override
 	public boolean equals(Object o)
 	{
 		if(o instanceof HomePoint)
-			return name.equals(((HomePoint)o).name);
+			return homename.equals(((HomePoint)o).homename);
 
 		return false;
 	}
@@ -137,19 +131,20 @@ public class HomePoint
 	@Override
 	public int hashCode()
 	{
-		return name.hashCode();
+		return homename.hashCode();
 	}
 
 	/**
 	 * dummy constructor used to create a empty instance
 	 */
-	private HomePoint(String name, Object dummy)
+	private HomePoint(EntityPlayerMP player,String name, Object dummy)
 	{
-		this.name = name;
+		this.UUID=player.getUniqueID().toString();
+		this.homename = name;
 	}
 	public static boolean delHomePoint(EntityPlayerMP player,String homename)
 	{
-		HomePoint warpPoint = new HomePoint(player.getUniqueID()+","+homename, null);
+		HomePoint warpPoint = new HomePoint(player,homename, null);
 		if(homes.contains(warpPoint))
 		{
 			homes.remove(warpPoint);
